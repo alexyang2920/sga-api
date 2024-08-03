@@ -3,11 +3,15 @@ from typing import Annotated
 
 from contextlib import asynccontextmanager
 from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
 
 from .users.models import User
 from .users.service import get_user_by_email
 from .database import SessionLocal
-from .security import oauth2_scheme, parse_access_token
+from .utils import parse_access_token
+
+# declare that the token url is '/api/auth/token'
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/token")
 
 
 async def get_db():
