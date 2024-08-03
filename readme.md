@@ -7,6 +7,7 @@
   - pip install pyjwt
   - pip install "passlib[bcrypt]"
   - pip install pydantic_settings
+  - pip install aiosqlite
   
   - or pip install -r requirements.txt
 

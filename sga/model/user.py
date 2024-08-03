@@ -14,4 +14,5 @@ class User(Base):
     hashed_password = Column(String(50), nullable=False)
     is_active = Column(Boolean, default=True)
 
-    roles = relationship("Role", secondary=user_role_table, back_populates="users")
+    # need to be eagar loading, otherwise it failed in routers.
+    roles = relationship("Role", secondary=user_role_table, back_populates="users", lazy='joined')

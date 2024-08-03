@@ -1,26 +1,36 @@
+from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Annotated
 
+from contextlib import asynccontextmanager
 from fastapi import Depends, HTTPException, status
-from sqlalchemy.orm import Session
 
-from .models.user import User
-from .models.meta import SessionLocal
+from .model.user import User
+from .model.meta import SessionLocal
 from .security import oauth2_scheme, parse_access_token
 from .crud import user as userDao
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+async def get_db():
+    async with SessionLocal() as session:
+        yield session
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)):
+@asynccontextmanager
+async def transactional_session():
+    async with get_db() as session:
+        async with session.begin():
+            try:
+                yield session
+                await session.commit()
+            except Exception as e:
+                await session.rollback()
+                raise HTTPException(status_code=500, detail=str(e))
+
+
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_db)):
     payload = parse_access_token(token)
     username = payload.get("sub") if payload else None
-    user = userDao.get_user_by_email(db, username) if username else None
+    user = await userDao.get_user_by_email(db, username) if username else None
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

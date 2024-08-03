@@ -2,7 +2,7 @@ from typing import Annotated
 from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.orm import Session
+from sqlalchemy.ext.asyncio import AsyncSession
 from ..dependencies import get_db
 from ..crud import user as userDao
 from ..security import create_access_token, ACCESS_TOKEN_EXPIRE_MINUTES
@@ -13,8 +13,8 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
-def authenticate_user(username: str, password: str, db: Session):
-    user = userDao.get_user_by_email(db, username)
+async def authenticate_user(username: str, password: str, db: AsyncSession):
+    user = await userDao.get_user_by_email(db, username)
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
 
@@ -25,8 +25,8 @@ def authenticate_user(username: str, password: str, db: Session):
 
 
 @router.post("/token")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
-    user = authenticate_user(form_data.username, form_data.password, db)
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: AsyncSession = Depends(get_db)):
+    user = await authenticate_user(form_data.username, form_data.password, db)
     access_token = create_access_token(
         data={"sub": user.email},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

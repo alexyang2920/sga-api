@@ -1,8 +1,14 @@
-from sqlalchemy.orm import Session
-from ..models.role import Role
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.future import select
 
-def get_roles(db: Session):
-    return db.query(Role).all()
+from ..model.role import Role
 
-def get_role(db: Session, role_id: int):
-    return db.query(Role).filter(Role.id == role_id).first()
+async def get_roles(db: AsyncSession):
+    result = await db.execute(select(Role))
+    return result.scalars().all()
+
+
+async def get_role(db: AsyncSession, role_id: int):
+    result = await db.execute(select(Role).where(Role.id == role_id))
+    return result.scalar()
+
