@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 
-from ..model.role import Role
+from .models import Role
 
 async def get_roles(db: AsyncSession):
     result = await db.execute(select(Role))

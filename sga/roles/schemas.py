@@ -4,14 +4,13 @@ class RoleBase(BaseModel):
     name: str
 
 
-class RoleCreate(RoleBase):
+class RoleCreateSchema(RoleBase):
     pass
 
 
-class Role(RoleBase):
+class RoleSchema(RoleBase):
     id: int
     name: str
 
     class Config: 
         from_attributes = True
-

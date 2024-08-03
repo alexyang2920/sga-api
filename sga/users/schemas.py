@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from typing import List
-from .role import Role
+from ..roles.schemas import RoleSchema
 
 
 class UserBase(BaseModel):
@@ -8,15 +8,14 @@ class UserBase(BaseModel):
     email: str
 
 
-class UserCreate(UserBase):
+class UserCreateSchema(UserBase):
     password: str
 
 
-class User(UserBase):
+class UserSchema(UserBase):
     id: int
     is_active: bool
-    roles: List[Role]
+    roles: List[RoleSchema]
 
     class Config: 
         from_attributes = True
-

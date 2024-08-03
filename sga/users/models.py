@@ -2,7 +2,7 @@ from sqlalchemy import Boolean, Column, Integer, String
 from sqlalchemy.orm import relationship
 
 from ..database import Base
-from .role import user_role_table
+from ..roles.models import user_role_table
 
 
 class User(Base):

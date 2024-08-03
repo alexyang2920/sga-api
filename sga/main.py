@@ -1,15 +1,15 @@
 from fastapi import FastAPI
 
-from .routers import users
-from .routers import auth
-from .routers import roles
+from .routers.auth import router as authRouter
+from .users.router import router as usersRouter
+from .roles.router import router as rolesRouter
 from .events.router import router as eventsRouter
 
 app = FastAPI()
 
-app.include_router(auth.router, prefix="/api")
-app.include_router(users.router, prefix="/api")
-app.include_router(roles.router, prefix="/api")
+app.include_router(authRouter, prefix="/api")
+app.include_router(usersRouter, prefix="/api")
+app.include_router(rolesRouter, prefix="/api")
 app.include_router(eventsRouter, prefix="/api")
 
 

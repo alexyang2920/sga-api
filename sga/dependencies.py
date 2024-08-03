@@ -4,10 +4,10 @@ from typing import Annotated
 from contextlib import asynccontextmanager
 from fastapi import Depends, HTTPException, status
 
-from .model.user import User
+from .users.models import User
+from .users.service import get_user_by_email
 from .database import SessionLocal
 from .security import oauth2_scheme, parse_access_token
-from .crud import user as userDao
 
 
 async def get_db():
@@ -30,7 +30,7 @@ async def transactional_session():
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_db)):
     payload = parse_access_token(token)
     username = payload.get("sub") if payload else None
-    user = await userDao.get_user_by_email(db, username) if username else None
+    user = await get_user_by_email(db, username) if username else None
     if user is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

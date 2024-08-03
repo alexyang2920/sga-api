@@ -17,8 +17,8 @@ if config.config_file_name is not None:
 # add your model's MetaData object here
 # for 'autogenerate' support
 from sga.events.models import Event
-from sga.model.user import User
-from sga.model.role import Role
+from sga.users.models import User
+from sga.roles.models import Role
 
 from sga.database import Base
 target_metadata = Base.metadata
