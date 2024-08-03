@@ -6,6 +6,7 @@
   - pip install alembic
   - pip install pyjwt
   - pip install "passlib[bcrypt]"
+  - pip install pydantic_settings
   
 # alembic
   - alembic revision --autogenerate -m "Initial migration"
