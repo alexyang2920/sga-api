@@ -2,30 +2,31 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
 from passlib.context import CryptContext
 
-from .. import model, schemas
+from ..model.user import User
+from .. import schemas
 
 # password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def get_user(db: AsyncSession, user_id: int):
-    result = await db.execute(select(model.User).where(model.User.id == user_id))
+    result = await db.execute(select(User).where(User.id == user_id))
     return result.scalar()
 
 
 async def get_user_by_email(db: AsyncSession, email: str):
-    result = await db.execute(select(model.User).where(model.User.email == email))
+    result = await db.execute(select(User).where(User.email == email))
     return result.scalar()
 
 
 async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
-    result = await db.execute(select(model.User))
+    result = await db.execute(select(User))
     return result.unique().scalars().all()
 
 
 async def create_user(db: AsyncSession, user: schemas.UserCreate):
     try:
-      db_user = model.User(name=user.name, email=user.email, hashed_password=get_password_hash(user.password))
+      db_user = User(name=user.name, email=user.email, hashed_password=get_password_hash(user.password))
       db.add(db_user)
       await db.commit()
       await db.refresh(db_user)

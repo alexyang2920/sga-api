@@ -6,7 +6,7 @@ from .. import schemas
 from ..crud import user as userDao
 from ..crud import role as roleDao
 from ..dependencies import get_db, get_current_active_user
-from .. import model
+from ..model.user import User
 
 
 router = APIRouter(
@@ -17,7 +17,7 @@ router = APIRouter(
 
 
 @router.get("/me", response_model=schemas.User)
-async def read_me(current_user: Annotated[model.User, Depends(get_current_active_user)]):
+async def read_me(current_user: Annotated[User, Depends(get_current_active_user)]):
     return current_user
 
 

@@ -8,6 +8,7 @@
   - pip install "passlib[bcrypt]"
   - pip install pydantic_settings
   - pip install aiosqlite
+  - pip install pytz
   
   - or pip install -r requirements.txt
 

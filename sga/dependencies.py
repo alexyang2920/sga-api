@@ -5,7 +5,7 @@ from contextlib import asynccontextmanager
 from fastapi import Depends, HTTPException, status
 
 from .model.user import User
-from .model.meta import SessionLocal
+from .database import SessionLocal
 from .security import oauth2_scheme, parse_access_token
 from .crud import user as userDao
 

@@ -1,8 +1,8 @@
-"""initialize role data
+"""init role data
 
-Revision ID: 1e3e8661d49c
-Revises: a8d93b70b628
-Create Date: 2024-08-03 00:52:41.155023
+Revision ID: 2a1ef9d74c3c
+Revises: d87049569cd5
+Create Date: 2024-08-03 17:32:53.009575
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '1e3e8661d49c'
-down_revision: Union[str, None] = 'a8d93b70b628'
+revision: str = '2a1ef9d74c3c'
+down_revision: Union[str, None] = 'd87049569cd5'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
@@ -27,9 +27,9 @@ def upgrade() -> None:
         ),
         [
             {'id': 1, 'name': 'Admin'},
-            {'id': 2, 'name': 'Users'},
-            {'id': 3, 'name': 'Volunteers'},
-            {'id': 4, 'name': 'Mentors'}
+            {'id': 2, 'name': 'User'},
+            {'id': 3, 'name': 'Volunteer'},
+            {'id': 4, 'name': 'Mentor'}
         ]
     )
 
