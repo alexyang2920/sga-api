@@ -18,5 +18,5 @@ class User(UserBase):
     roles: List[Role]
 
     class Config: 
-        orm_mode = True
+        from_attributes = True
 

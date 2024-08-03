@@ -13,4 +13,4 @@ app.include_router(roles.router, prefix="/api")
 
 @app.get("/")
 def read_root():
-    return "Welcome"
+    return {"message": "It's good!"}

@@ -8,6 +8,8 @@
   - pip install "passlib[bcrypt]"
   - pip install pydantic_settings
   
+  - or pip install -r requirements.txt
+
 # alembic
   - alembic revision --autogenerate -m "Initial migration"
   - alembic revision -m "xxxx"
