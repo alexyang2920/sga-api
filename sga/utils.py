@@ -1,6 +1,7 @@
 import jwt
 from jwt.exceptions import InvalidTokenError
 from datetime import datetime, timedelta, timezone
+from passlib.context import CryptContext
 from .config import settings
 
 
@@ -22,3 +23,14 @@ def parse_access_token(token: str):
     except InvalidTokenError:
         return None
 
+
+# password hashing
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)

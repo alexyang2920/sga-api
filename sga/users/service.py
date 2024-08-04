@@ -1,12 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
-from passlib.context import CryptContext
 
 from .models import User
-from .schemas import UserCreateSchema
-
-# password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 async def get_user(db: AsyncSession, user_id: int):
@@ -23,22 +18,3 @@ async def get_users(db: AsyncSession, skip: int = 0, limit: int = 100):
     result = await db.execute(select(User))
     return result.unique().scalars().all()
 
-
-async def create_user(db: AsyncSession, user: UserCreateSchema):
-    try:
-      db_user = User(name=user.name, email=user.email, hashed_password=get_password_hash(user.password))
-      db.add(db_user)
-      await db.commit()
-      await db.refresh(db_user)
-      return db_user
-    except Exception as e:
-        await db.rollback()
-        raise e
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)

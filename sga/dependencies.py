@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
+from contextlib import asynccontextmanager
 from typing import Annotated
 
-from contextlib import asynccontextmanager
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
@@ -20,18 +20,29 @@ async def get_db():
 
 
 @asynccontextmanager
-async def transactional_session():
-    async with get_db() as session:
-        async with session.begin():
-            try:
-                yield session
-                await session.commit()
-            except Exception as e:
-                await session.rollback()
-                raise HTTPException(status_code=500, detail=str(e))
+async def transactional_context(session: AsyncSession, to_refresh=None):
+    """
+    Support transactional
+    """
+    if to_refresh is None:
+        to_refresh = []
+    try:
+        yield session
+        await session.commit()
+        for obj in to_refresh:
+            await session.refresh(obj)
+    except Exception as e:
+        await session.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=str(e)
+        )
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: AsyncSession = Depends(get_db)):
+    """
+    Dependency for retrieving current user.
+    """
     payload = parse_access_token(token)
     username = payload.get("sub") if payload else None
     user = await get_user_by_email(db, username) if username else None
@@ -44,21 +55,27 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)], db: As
     return user
 
 
-async def get_current_active_user(
-    current_user: Annotated[User, Depends(get_current_user)],
-):
+async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]):
+    """
+    Dependency for retrieving current active user.
+    """
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
 class AuthenticatedChecker:
-
+    """
+    Dependency that requires user is authenticated, a.k.a logged in.
+    """
     def __call__(self, _: User = Depends(get_current_active_user)) -> bool:
         return True;
 
 
 class RoleChecker:
+    """
+    Dependency that requires user is authenticated and has proper roles.
+    """
 
     def __init__(self, allowed_roles: list[str] | None = None) -> None:
         self.allowed_roles = allowed_roles
@@ -72,4 +89,5 @@ class RoleChecker:
             for role in self.allowed_roles:
                 if role in role_names:
                     return True
+
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="403 Forbiden")

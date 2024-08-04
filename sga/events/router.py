@@ -1,9 +1,10 @@
 from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dependencies import get_db
+from ..dependencies import get_db, transactional_context
 from .schemas import EventSchema, EventCreateSchema, EventUpdateSchema, update_to_model
-from .service import get_events, get_event, create_event, save_event
+from .service import get_events, get_event
+from .models import Event
 
 router = APIRouter(
     prefix="/events",
@@ -13,8 +14,20 @@ router = APIRouter(
 
 
 @router.post("/", response_model=EventSchema)
-async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db)):    
-    return await create_event(db=db, event=event)
+async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db)):
+    db_event = Event(
+        title=event.title,
+        location=event.location,
+        image=event.image,
+        content=event.content,
+        start_date_time=event.start_date_time,
+        end_date_time=event.end_date_time
+    )
+    db.add(db_event)
+    async with transactional_context(db, to_refresh=[db_event]):
+        pass
+
+    return db_event
 
 
 @router.get("/", response_model=list[EventSchema])
@@ -38,5 +51,9 @@ async def read_event(event_id: int, event_update: EventUpdateSchema, db: AsyncSe
         raise HTTPException(status_code=404, detail="Event not found")
 
     event = update_to_model(event_update, event)
-    event = await save_event(db, event)
+    db.add(event)
+
+    async with transactional_context(db, to_refresh=[event]):
+        pass
+
     return event
