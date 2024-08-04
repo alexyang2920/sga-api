@@ -7,6 +7,7 @@ from fastapi.security import OAuth2PasswordBearer
 
 from .users.models import User
 from .users.service import get_user_by_email
+from .roles.models import RoleEnum
 from .database import SessionLocal
 from .utils import parse_access_token
 
@@ -77,7 +78,7 @@ class RoleChecker:
     Dependency that requires user is authenticated and has proper roles.
     """
 
-    def __init__(self, allowed_roles: list[str] | None = None) -> None:
+    def __init__(self, allowed_roles: list[RoleEnum] | None = None) -> None:
         self.allowed_roles = allowed_roles
     
     def __call__(self, user: User = Depends(get_current_active_user)) -> bool:

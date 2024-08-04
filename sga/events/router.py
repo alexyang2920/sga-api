@@ -1,7 +1,9 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..dependencies import get_db, transactional_context
+
+from ..dependencies import get_db, transactional_context, RoleChecker
+from ..roles.models import RoleEnum
+
 from .schemas import EventSchema, EventCreateSchema, EventUpdateSchema, update_to_model
 from .service import get_events, get_event
 from .models import Event
@@ -14,7 +16,7 @@ router = APIRouter(
 
 
 @router.post("/", response_model=EventSchema)
-async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db)):
+async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     db_event = Event(
         title=event.title,
         location=event.location,
@@ -45,7 +47,7 @@ async def read_event(event_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{event_id}", response_model=EventSchema)
-async def read_event(event_id: int, event_update: EventUpdateSchema, db: AsyncSession = Depends(get_db)):
+async def update_event(event_id: int, event_update: EventUpdateSchema, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     event = await get_event(db, event_id=event_id)
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -57,3 +59,17 @@ async def read_event(event_id: int, event_update: EventUpdateSchema, db: AsyncSe
         pass
 
     return event
+
+
+@router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_event(event_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
+    """
+    Delete a event with given event id, should only allowed for admin.
+    """
+    event = await get_event(db, event_id=event_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    await db.delete(event)
+    async with transactional_context(db):
+        pass

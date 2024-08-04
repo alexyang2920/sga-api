@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..roles.service import get_role
+from ..roles.models import RoleEnum
 from ..dependencies import get_db, get_current_active_user, transactional_context, RoleChecker
 from ..utils import get_password_hash
 
@@ -59,7 +60,7 @@ async def update_user(
 
 
 @router.get("/", response_model=list[UserSchema])
-async def read_users(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=['Admin']))):
+async def read_users(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     """
     Read all users, should only allowed for admin.
     """
@@ -68,7 +69,7 @@ async def read_users(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(
 
 
 @router.get("/{user_id}", response_model=UserSchema)
-async def read_user(user_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=['Admin']))):
+async def read_user(user_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     """
     Read a specific user with given user id, should only allowed for admin.
     """
@@ -83,7 +84,7 @@ async def update_user(
     user_id: int,
     update_user: UserUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _: bool = Depends(RoleChecker(allowed_roles=['Admin']))):
+    _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     """
     Update user, allowed for admin only.
     """
@@ -100,7 +101,7 @@ async def update_user(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=['Admin']))):
+async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     """
     Delete a user with given user id, should only allowed for admin.
     """
@@ -114,7 +115,7 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), _: bool 
 
 
 @router.post("/{user_id}/roles/{role_id}", response_model=UserSchema)
-async def add_user_to_role(user_id: int, role_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=['Admin']))):
+async def add_user_to_role(user_id: int, role_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     """
     Assign a role to a user. should only allowed for admin.
     """
