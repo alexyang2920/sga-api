@@ -1,0 +1,23 @@
+version: "3.9"
+name: sga
+services:
+  sga-database:
+    image: postgres:16.0-alpine3.18
+    container_name: sga-database
+    environment:
+      - POSTGRES_USER=sga
+      - POSTGRES_PASSWORD=Temp1234
+      - PGDATA=/var/lib/postgresql-static/data
+    volumes:
+      - sga-db:/var/lib/postgresql-static/data
+    ports:
+      - "5432:5432"
+    networks:
+      - sga
+
+networks:
+  sga:
+
+volumes:
+  sga-db:
+    driver: local
