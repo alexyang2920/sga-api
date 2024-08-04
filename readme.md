@@ -43,3 +43,15 @@
         - Script: path to uvicorn
         - Script parameters: sga.main:app --host 0.0.0.0 --port 9090 --reload
         - Run
+
+# generate self signed key for nginx
+    openssl req -x509 -nodes -days 365 -subj "/C=US/ST=Oklahoma/O=SGN/CN=sharegrow.local" -newkey rsa:2048 -keyout ssl.key -out ssl.crt;
+    - add the ssl.crt into the system certification
+      Keychain Access -> System (left side menu) -> Certificates -> import (may need admin permission) -> set always trust by right clicking "get info"
+
+# register host in mac
+    /etc/hosts
+    127.0.0.1       sharegrow.local
+
+# access to ui
+    https://sharegrow.local/
