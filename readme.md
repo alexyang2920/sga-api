@@ -20,3 +20,6 @@
 # run in dev
   - fastapi dev sga/main.py
   - uvicorn sga.main:app --host 0.0.0.0 --port 9090 --reload
+
+# setup database in docker
+    docker compose up -d
