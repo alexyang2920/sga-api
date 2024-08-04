@@ -2,8 +2,8 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..dependencies import get_db
-from .schemas import EventSchema, EventCreateSchema
-from .service import get_events, get_event, create_event
+from .schemas import EventSchema, EventCreateSchema, EventUpdateSchema, update_to_model
+from .service import get_events, get_event, create_event, save_event
 
 router = APIRouter(
     prefix="/events",
@@ -28,4 +28,15 @@ async def read_event(event_id: int, db: AsyncSession = Depends(get_db)):
     event = await get_event(db, event_id=event_id)
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
+    return event
+
+
+@router.put("/{event_id}", response_model=EventSchema)
+async def read_event(event_id: int, event_update: EventUpdateSchema, db: AsyncSession = Depends(get_db)):
+    event = await get_event(db, event_id=event_id)
+    if event is None:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    event = update_to_model(event_update, event)
+    event = await save_event(db, event)
     return event

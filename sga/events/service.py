@@ -23,6 +23,16 @@ async def create_event(db: AsyncSession, event: EventSchema):
         await db.rollback()
         raise e
 
+async def save_event(db: AsyncSession, event: Event):
+    try:
+        db.add(event)
+        await db.commit()
+        await db.refresh(event)
+        return event
+    except Exception as e:
+        await db.rollback()
+        raise e
+
 
 async def get_events(db: AsyncSession, skip: int = 0, limit: int = 100):
     result = await db.execute(select(Event))
