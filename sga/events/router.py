@@ -15,7 +15,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=EventSchema)
+@router.post("", response_model=EventSchema)
 async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     db_event = Event(
         title=event.title,
@@ -32,7 +32,7 @@ async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db)
     return db_event
 
 
-@router.get("/", response_model=list[EventSchema])
+@router.get("", response_model=list[EventSchema])
 async def read_events(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
   events = await get_events(db, skip, limit)
   return events

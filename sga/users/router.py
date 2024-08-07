@@ -19,7 +19,7 @@ router = APIRouter(
 )
 
 
-@router.post("/", response_model=UserSchema)
+@router.post("", response_model=UserSchema)
 async def create_user(user: UserCreateSchema, db: AsyncSession = Depends(get_db)):
     """
     Create new user. anyone could do that.
@@ -59,7 +59,7 @@ async def update_user(
     return current_user
 
 
-@router.get("/", response_model=list[UserSchema])
+@router.get("", response_model=list[UserSchema])
 async def read_users(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     """
     Read all users, should only allowed for admin.

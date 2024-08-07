@@ -16,7 +16,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=list[RoleSchema])
+@router.get("", response_model=list[RoleSchema])
 async def read_roles(db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
   roles = await get_roles(db)
   return roles
