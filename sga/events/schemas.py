@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from datetime import datetime
 
 from .models import Event
 
 
 class EventBase(BaseModel):
-    title: str
+    title: str = Field(min_length=1)
     location: str
     image: str
     content: str
