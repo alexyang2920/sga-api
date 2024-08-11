@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, field_validator
 from typing import List
 from ..roles.schemas import RoleSchema
 
@@ -6,6 +6,12 @@ from ..roles.schemas import RoleSchema
 class UserBase(BaseModel):
     name: str = Field(min_length=1)
     email: EmailStr
+
+    @field_validator("email")
+    def to_lowercase(cls, value):
+        if isinstance(value, str):
+            return value.lower()
+        return value
 
 
 class UserCreateSchema(UserBase):

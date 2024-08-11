@@ -27,6 +27,6 @@ async def authenticate_user(username: str, password: str, db: AsyncSession):
 
 @router.post("/token")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: AsyncSession = Depends(get_db)):
-    user = await authenticate_user(form_data.username, form_data.password, db)
+    user = await authenticate_user(form_data.username.lower(), form_data.password, db)
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
