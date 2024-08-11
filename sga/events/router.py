@@ -16,7 +16,8 @@ router = APIRouter(
 
 
 @router.post("", response_model=EventSchema)
-async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
+async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db),
+                    _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     db_event = Event(
         title=event.title,
         location=event.location,
@@ -34,8 +35,8 @@ async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db)
 
 @router.get("", response_model=list[EventSchema])
 async def read_events(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
-  events = await get_events(db, skip, limit)
-  return events
+    events = await get_events(db, skip, limit)
+    return events
 
 
 @router.get("/{event_id}", response_model=EventSchema)
@@ -47,7 +48,8 @@ async def read_event(event_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.put("/{event_id}", response_model=EventSchema)
-async def update_event(event_id: int, event_update: EventUpdateSchema, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
+async def update_event(event_id: int, event_update: EventUpdateSchema, db: AsyncSession = Depends(get_db),
+                       _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     event = await get_event(db, event_id=event_id)
     if event is None:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -62,7 +64,8 @@ async def update_event(event_id: int, event_update: EventUpdateSchema, db: Async
 
 
 @router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_event(event_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
+async def delete_event(event_id: int, db: AsyncSession = Depends(get_db),
+                       _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
     """
     Delete a event with given event id, should only allowed for admin.
     """

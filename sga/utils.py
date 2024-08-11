@@ -19,7 +19,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 def parse_access_token(token: str):
     try:
-      return jwt.decode(token, settings.jwt_secret_key, algorithms=settings.jwt_algo)
+        return jwt.decode(token, settings.jwt_secret_key, algorithms=settings.jwt_algo)
     except InvalidTokenError:
         return None
 

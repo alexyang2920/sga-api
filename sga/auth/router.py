@@ -1,5 +1,4 @@
 from typing import Annotated
-from datetime import timedelta
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -13,6 +12,7 @@ router = APIRouter(
     tags=["auth"],
     responses={404: {"description": "Not found"}},
 )
+
 
 async def authenticate_user(username: str, password: str, db: AsyncSession):
     user = await get_user_by_email(db, username)
