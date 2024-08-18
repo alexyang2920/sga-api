@@ -30,6 +30,13 @@ class EventSchema(EventBase):
         from_attributes = True
 
 
+class PaginatedEvents(BaseModel):
+    items: list[EventSchema]
+    total_count: int
+    page_number: int
+    page_size: int
+
+
 def update_to_model(event_update: EventUpdateSchema, event: Event) -> Event:
     event.title = event_update.title
     event.location = event_update.location

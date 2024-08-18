@@ -4,8 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ..dependencies import get_db, transactional_context, RoleChecker
 from ..roles.models import RoleEnum
 
-from .schemas import EventSchema, EventCreateSchema, EventUpdateSchema, update_to_model
-from .service import get_events, get_event
+from .schemas import EventSchema, EventCreateSchema, EventUpdateSchema, PaginatedEvents, update_to_model
+from .service import get_events, get_event, get_total_count
 from .models import Event
 
 router = APIRouter(
@@ -33,10 +33,19 @@ async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db)
     return db_event
 
 
-@router.get("", response_model=list[EventSchema])
-async def read_events(skip: int = 0, limit: int = 10, db: AsyncSession = Depends(get_db)):
-    events = await get_events(db, skip, limit)
-    return events
+@router.get("", response_model=PaginatedEvents)
+async def read_events(page_number: int = 1, page_size: int = 20, db: AsyncSession = Depends(get_db)):
+    if page_number <= 0 or page_size <= 0:
+        raise HTTPException("Invalid page_number or page_size.")
+
+    total_count = await get_total_count(db)
+    events = await get_events(db, (page_number - 1) * page_size, page_size)
+    return {
+        "total_count" : total_count,
+        "items": events,
+        "page_number": page_number,
+        "page_size": page_size
+    }
 
 
 @router.get("/{event_id}", response_model=EventSchema)
