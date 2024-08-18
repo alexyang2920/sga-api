@@ -10,7 +10,8 @@ async def get_total_count(db: AsyncSession):
     return result.scalar()
 
 
-async def get_events(db: AsyncSession, skip: int = 0, limit: int = 20, order_by = Event.id.desc()):
+async def get_events(db: AsyncSession, skip: int = 0, limit: int = 20, sort_by: str = "id", sort_order: str = 'desc'):
+    order_by = getattr(Event, sort_by).asc() if sort_order == "asc" else getattr(Event, sort_by).desc()
     result = await db.execute(select(Event).order_by(order_by).offset(skip).limit(limit))
     return result.scalars().all()
 
