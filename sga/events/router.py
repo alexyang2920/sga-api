@@ -34,7 +34,7 @@ async def add_event(event: EventCreateSchema, db: AsyncSession = Depends(get_db)
 
 
 @router.get("", response_model=PaginatedEvents)
-async def read_events(page_number: int = 1, page_size: int = 20, sort_by = "id", sort_order: str = 'desc', db: AsyncSession = Depends(get_db)):
+async def read_events(page_number: int = 1, page_size: int = 20, sort_by = "id", sort_order: str = 'desc', search: str = '', db: AsyncSession = Depends(get_db)):
     if page_number <= 0 or page_size <= 0:
         raise ValueError("Invalid page_number or page_size. Must be greater than 0.")
 
@@ -42,7 +42,7 @@ async def read_events(page_number: int = 1, page_size: int = 20, sort_by = "id",
         raise ValueError("Invalid sort_order. Must be 'asc' or 'desc'.")
 
     total_count = await get_total_count(db)
-    events = await get_events(db, (page_number - 1) * page_size, page_size, sort_by, sort_order)
+    events = await get_events(db, (page_number - 1) * page_size, page_size, sort_by, sort_order, search.strip())
     return {
         "total_count" : total_count,
         "items": events,
