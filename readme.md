@@ -55,3 +55,6 @@
 
 # access to ui
     https://sharegrow.local/
+
+# Old Website: https://www.sharegrow2.org, https://www.sharegrow.org
+# This new api server together with react ui is hosting on aws ec2 for testing: https://ec2-3-144-113-209.us-east-2.compute.amazonaws.com/
