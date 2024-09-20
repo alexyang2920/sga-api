@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ..roles.service import get_role
 from ..roles.models import RoleEnum
-from ..dependencies import get_db, get_current_active_user, transactional_context, RoleChecker
+from ..dependencies import get_current_user, get_db, get_current_active_user, transactional_context, RoleChecker
 from ..utils import get_password_hash
 
 from .service import get_users, get_user, get_user_by_email
@@ -84,7 +84,8 @@ async def update_user(
     user_id: int,
     update_user: UserUpdateSchema,
     db: AsyncSession = Depends(get_db),
-    _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
+    _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin])),
+    current_user: User = Depends(get_current_user)):
     """
     Update user, allowed for admin only.
     """
@@ -93,7 +94,8 @@ async def update_user(
         raise HTTPException(status_code=404, detail="User not found")
 
     db_user.name = update_user.name
-    db_user.is_active = update_user.is_active
+    if current_user.id != user_id :
+        db_user.is_active = update_user.is_active
 
     async with transactional_context(db, to_refresh=[db_user]):
         pass
@@ -101,13 +103,20 @@ async def update_user(
 
 
 @router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_user(user_id: int, db: AsyncSession = Depends(get_db), _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin]))):
+async def delete_user(
+    user_id: int,
+    db: AsyncSession = Depends(get_db),
+    _: bool = Depends(RoleChecker(allowed_roles=[RoleEnum.Admin])),
+    current_user: User = Depends(get_current_user)):
     """
     Delete a user with given user id, should only allowed for admin.
     """
     db_user = await get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
+
+    if current_user.id == db_user.id:
+        raise HTTPException(status_code=403, detail='You can not delete yourself')
 
     await db.delete(db_user)
     async with transactional_context(db):
