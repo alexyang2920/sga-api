@@ -19,6 +19,7 @@ if config.config_file_name is not None:
 from sga.events.models import Event
 from sga.users.models import User
 from sga.roles.models import Role
+from sga.tutoring.models import TutoringProgram
 
 from sga.database import Base
 target_metadata = Base.metadata
