@@ -1,18 +1,7 @@
 # SGA API with FastAPI + SqlAlchemy + Alembic
 
 # install dependencies
-  - pip install "fastapi[standard]"
-  - pip install sqlalchemy
-  - pip install alembic
-  - pip install pyjwt
-  - pip install "passlib[bcrypt]"
-  - pip install pydantic_settings
-  - pip install aiosqlite
-  - pip install pytz
-  - pip install asyncpg
-  - pip install psycopg2-binary 
-  
-  - or pip install -r requirements.txt
+   pip install -r requirements.txt
 
 # alembic
   - alembic revision --autogenerate -m "Initial migration"
